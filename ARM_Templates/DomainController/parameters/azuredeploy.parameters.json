@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSettings": {
+      "value": {
+        "adminUsername": "adminsverho",
+        "sku": "2016-Datacenter-Server-Core-smalldisk",
+        "offer": "WindowsServer",
+        "publisher": "MicrosoftWindowsServer",
+        "vmName": "SRVDC01",
+        "vmSize": "Standard_D2_v3",
+        "availabilitySetName": "AS-DC",
+        "diskEncryptionSequenceVersion": "1.0"
+      }
+    },
+    "networkSettings": {
+      "value": {
+        "vnetResourceGroupName": "RG-Networking-Workshop",
+        "vnetName": "VNET-Workshop",
+        "subnetName": "SNET-Infra"
+      }
+    },
+    "storageSettings": {
+      "value": {
+        "storageAccountType": "Standard_LRS",
+        "storageAccountContainer": "vhds"
+      }
+    },
+    "domainSettings": {
+      "value": {
+        "domainFQDN": "workshop.local",
+        "domainAdminUsername": "adminsverho"
+      }
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/84988180-315f-4795-bb93-900571933667/resourceGroups/RG-WindowsVSTSBuild/providers/Microsoft.KeyVault/vaults/svhbh54keyvault"
+        },
+        "secretName": "workshoppassword"
+      }
+    },
+    "domainAdminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/84988180-315f-4795-bb93-900571933667/resourceGroups/RG-WindowsVSTSBuild/providers/Microsoft.KeyVault/vaults/svhbh54keyvault"
+        },
+        "secretName": "workshoppassword"
+      }
+    },
+    "azureEnvironment": {
+      "value": "azure"
+    }
+  }
+}

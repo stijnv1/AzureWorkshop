@@ -1,0 +1,228 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSettings": {
+      "type": "object"
+    },
+    "networkSettings": {
+      "type": "object"
+    },
+    "storageSettings": {
+      "type": "object"
+    },
+    "azureEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "azurestack",
+        "azure"
+      ]
+    },
+    "domainSettings": {
+      "type": "object"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "domainAdminPassword": {
+      "type": "securestring"
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
+      },
+      "defaultValue": ""
+    },
+    "_artifactsLocationSasToken": {
+      "defaultValue": "",
+      "metadata": {
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "apiObject": {
+      "azurestack": {
+        "network": {
+          "virtualNetwork": "2015-06-15",
+          "networkSecurityGroups": "2015-06-15",
+          "publicIP": "2015-06-15"
+        },
+        "compute": {
+          "virtualMachine": "2016-03-30",
+          "availabilitySet": "2016-03-30",
+          "extensions": "2016-03-30"
+        },
+        "storage": {
+          "storageAccount": "2015-06-15"
+        }
+      },
+      "azure": {
+        "network": {
+          "virtualNetwork": "2018-04-01",
+          "networkSecurityGroups": "2018-04-01",
+          "publicIP": "2018-04-01"
+        },
+        "compute": {
+          "virtualMachine": "2018-04-01",
+          "managedDisks": "2018-04-01",
+          "availabilitySet": "2018-04-01",
+          "extensions": "2018-04-01",
+          "deployment": "2016-09-01"
+        },
+        "storage": {
+          "storageAccount": "2018-02-01"
+        }
+      }
+    },
+    "vnetID": "[resourceid(parameters('networkSettings').vnetResourceGroupName,'Microsoft.Network/virtualNetworks',parameters('networkSettings').vnetName)]",
+    "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('networkSettings').subnetName)]",
+    "nicName": "[concat(parameters('vmSettings').vmName,'_VNIC')]",
+    "OSDiskName": "[concat(parameters('vmSettings').vmName,'_OSDisk')]",
+    "storageURL": {
+      "azure": {
+        "url": ".blob.core.windows.net/"
+      },
+      "azurestack": {
+        "url": ".blob.local.azurestack.external/"
+      }
+    },
+    "adBDCModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/CreateNewAD.ps1.zip',parameters('_artifactsLocationSasToken'))]",
+    "adBDCConfigurationFunction": "CreateNewAD",
+    "adBDCConfigurationScript": "CreateNewAD.ps1",
+    "publicIPName": "[concat(parameters('vmSettings').vmName, '_PIP')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].network.publicIP]",
+      "location": "[resourceGroup().location]",
+      "name": "[variables('publicIPName')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "name": "[parameters('vmSettings').availabilitySetName]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].compute.availabilitySet]",
+      "dependsOn": [],
+      "properties": {
+        "platformUpdateDomainCount": 5,
+        "platformFaultDomainCount": 3
+      },
+      "sku": "aligned"
+    },
+    {
+      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].network.virtualNetwork]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "10.0.1.10",
+              "publicIPAddress": {
+                "id": "[resourceid('Microsoft.Network/publicIPAddresses', variables('publicIPName'))]"
+              },
+              "subnet": {
+                "id": "[variables('subnetID')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].compute.virtualMachine]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('vmSettings').vmName]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+        "[concat('Microsoft.Compute/availabilitySets/', parameters('vmSettings').availabilitySetName)]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Microsoft.Compute/availabilitySets',parameters('vmSettings').availabilitySetName)]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSettings').vmSize]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmSettings').vmName]",
+          "adminUsername": "[parameters('vmSettings').adminUsername]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('vmSettings').publisher]",
+            "offer": "[parameters('vmSettings').offer]",
+            "sku": "[parameters('vmSettings').sku]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[variables('OSDiskName')]",
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            }
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmSettings').vmName,'/CreateNewAD')]",
+      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].compute.extensions]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmSettings').vmName)]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.73",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "wmfVersion": "latest",
+          "configuration": {
+            "url": "[variables('adBDCModulesURL')]",
+            "script": "[variables('adBDCConfigurationScript')]",
+            "function": "[variables('adBDCConfigurationFunction')]"
+          },
+          "configurationArguments": {
+            "DomainName": "[parameters('domainSettings').domainFQDN]",
+            "AdminCreds": {
+              "UserName": "[parameters('domainSettings').domainAdminUsername]",
+              "Password": "PrivateSettingsRef:AdminPassword"
+            }
+          }
+        },
+        "protectedSettings": {
+          "Items": {
+            "AdminPassword": "[parameters('domainAdminPassword')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
