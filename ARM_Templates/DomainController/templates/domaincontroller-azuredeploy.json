@@ -72,7 +72,9 @@
         "platformUpdateDomainCount": 20,
         "platformFaultDomainCount": 3
       },
-      "sku": "aligned"
+      "sku": {
+        "name": "aligned"
+      }
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
