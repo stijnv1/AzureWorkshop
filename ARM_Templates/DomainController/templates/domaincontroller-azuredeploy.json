@@ -69,7 +69,7 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [],
       "properties": {
-        "platformUpdateDomainCount": 5,
+        "platformUpdateDomainCount": 20,
         "platformFaultDomainCount": 3
       },
       "sku": "aligned"
