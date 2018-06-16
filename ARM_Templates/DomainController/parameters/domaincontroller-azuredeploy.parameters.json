@@ -44,6 +44,9 @@
     },
     "storageaccountName": {
       "value": "svhbh54workshopsta"
+    },
+    "storageaccountNameRGName": {
+      "value": "RG-WorkshopPreps"
     }
   }
 }

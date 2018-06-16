@@ -38,6 +38,9 @@
         "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
       },
       "defaultValue": ""
+    },
+    "storageaccountNameRGName": {
+      "type": "string"
     }
   },
   "variables": {
@@ -164,7 +167,7 @@
         "settings": {
           "wmfVersion": "latest",
           "configuration": {
-            "url": "[concat(reference(parameters('storageaccountName'),'2017-10-01').primaryEndpoints['blob'],'/DSC/CreateNewAD.ps1.zip')]",
+            "url": "[concat(reference(resourceid(parameters('storageaccountNameRGName'),'Microsoft.Storage/storageAccounts',parameters('storageaccountName')),'2017-10-01').primaryEndpoints['blob'],'/DSC/CreateNewAD.ps1.zip')]",
             "script": "[variables('adBDCConfigurationScript')]",
             "function": "[variables('adBDCConfigurationFunction')]"
           },
