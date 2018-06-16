@@ -164,7 +164,7 @@
         "settings": {
           "wmfVersion": "latest",
           "configuration": {
-            "url": "[concat(reference(parameters('storageaccountName'),'2018-02-01').primaryEndpoints['blob'],'/DSC/CreateNewAD.ps1.zip')]",
+            "url": "[concat(reference(parameters('storageaccountName'),'2017-10-01').primaryEndpoints['blob'],'/DSC/CreateNewAD.ps1.zip')]",
             "script": "[variables('adBDCConfigurationScript')]",
             "function": "[variables('adBDCConfigurationFunction')]"
           },
