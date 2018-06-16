@@ -2,102 +2,60 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmSettings": {
-      "type": "object"
+    "availabilitySetName": {
+      "type": "string"
     },
-    "networkSettings": {
-      "type": "object"
+    "adminUsername": {
+      "type": "string"
     },
-    "storageSettings": {
-      "type": "object"
+    "vmName": {
+      "type": "string"
     },
-    "azureEnvironment": {
-      "type": "string",
-      "allowedValues": [
-        "azurestack",
-        "azure"
-      ]
+    "vmSize": {
+      "type": "string"
     },
-    "domainSettings": {
-      "type": "object"
+    "vnetRGName": {
+      "type": "string"
+    },
+    "vnetName": {
+      "type": "string"
+    },
+    "subnetName": {
+      "type": "string"
     },
     "adminPassword": {
       "type": "securestring"
     },
+    "domainFQDN": {
+      "type": "string"
+    },
     "domainAdminPassword": {
       "type": "securestring"
     },
-    "_artifactsLocation": {
+    "storageaccountName": {
       "type": "string",
       "metadata": {
         "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
       },
       "defaultValue": ""
-    },
-    "_artifactsLocationSasToken": {
-      "defaultValue": "",
-      "metadata": {
-        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-      },
-      "type": "securestring"
     }
   },
   "variables": {
-    "apiObject": {
-      "azurestack": {
-        "network": {
-          "virtualNetwork": "2015-06-15",
-          "networkSecurityGroups": "2015-06-15",
-          "publicIP": "2015-06-15"
-        },
-        "compute": {
-          "virtualMachine": "2016-03-30",
-          "availabilitySet": "2016-03-30",
-          "extensions": "2016-03-30"
-        },
-        "storage": {
-          "storageAccount": "2015-06-15"
-        }
-      },
-      "azure": {
-        "network": {
-          "virtualNetwork": "2018-04-01",
-          "networkSecurityGroups": "2018-04-01",
-          "publicIP": "2018-04-01"
-        },
-        "compute": {
-          "virtualMachine": "2018-04-01",
-          "managedDisks": "2018-04-01",
-          "availabilitySet": "2018-04-01",
-          "extensions": "2018-04-01",
-          "deployment": "2016-09-01"
-        },
-        "storage": {
-          "storageAccount": "2018-02-01"
-        }
-      }
-    },
-    "vnetID": "[resourceid(parameters('networkSettings').vnetResourceGroupName,'Microsoft.Network/virtualNetworks',parameters('networkSettings').vnetName)]",
-    "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('networkSettings').subnetName)]",
-    "nicName": "[concat(parameters('vmSettings').vmName,'_VNIC')]",
-    "OSDiskName": "[concat(parameters('vmSettings').vmName,'_OSDisk')]",
-    "storageURL": {
-      "azure": {
-        "url": ".blob.core.windows.net/"
-      },
-      "azurestack": {
-        "url": ".blob.local.azurestack.external/"
-      }
-    },
-    "adBDCModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/CreateNewAD.ps1.zip',parameters('_artifactsLocationSasToken'))]",
+    "vnetID": "[resourceid(parameters('vnetRGName'),'Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+    "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
+    "nicName": "[concat(parameters('vmName'),'-NIC')]",
+    "OSDiskName": "[concat(parameters('vmName'),'-OSDisk')]",
     "adBDCConfigurationFunction": "CreateNewAD",
     "adBDCConfigurationScript": "CreateNewAD.ps1",
-    "publicIPName": "[concat(parameters('vmSettings').vmName, '_PIP')]"
+    "publicIPName": "[concat(parameters('vmName'), '-PIP')]",
+    "osPublisher": "MicrosoftWindowsServer",
+    "osOffer": "WindowsServer",
+    "osSku": "2016-Datacenter-Server-Core-smalldisk"
   },
   "resources": [
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].network.publicIP]",
+      "apiVersion": "2018-04-01",
       "location": "[resourceGroup().location]",
       "name": "[variables('publicIPName')]",
       "properties": {
@@ -105,10 +63,10 @@
       }
     },
     {
-      "name": "[parameters('vmSettings').availabilitySetName]",
+      "name": "[parameters('availabilitySetName')]",
       "type": "Microsoft.Compute/availabilitySets",
+      "apiVersion": "2018-04-01",
       "location": "[resourceGroup().location]",
-      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].compute.availabilitySet]",
       "dependsOn": [],
       "properties": {
         "platformUpdateDomainCount": 5,
@@ -117,8 +75,8 @@
       "sku": "aligned"
     },
     {
-      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].network.virtualNetwork]",
       "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2018-04-01",
       "name": "[variables('nicName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
@@ -143,31 +101,31 @@
       }
     },
     {
-      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].compute.virtualMachine]",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmSettings').vmName]",
+      "apiVersion": "2018-04-01",
+      "name": "[parameters('vmName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
-        "[concat('Microsoft.Compute/availabilitySets/', parameters('vmSettings').availabilitySetName)]"
+        "[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]"
       ],
       "properties": {
         "availabilitySet": {
-          "id": "[resourceId('Microsoft.Microsoft.Compute/availabilitySets',parameters('vmSettings').availabilitySetName)]"
+          "id": "[resourceId('Microsoft.Microsoft.Compute/availabilitySets',parameters('availabilitySetName'))]"
         },
         "hardwareProfile": {
-          "vmSize": "[parameters('vmSettings').vmSize]"
+          "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('vmSettings').vmName]",
-          "adminUsername": "[parameters('vmSettings').adminUsername]",
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
-            "publisher": "[parameters('vmSettings').publisher]",
-            "offer": "[parameters('vmSettings').offer]",
-            "sku": "[parameters('vmSettings').sku]",
+            "publisher": "[variables('osPublisher')]",
+            "offer": "[variables('osOffer')]",
+            "sku": "[variables('osSku')]",
             "version": "latest"
           },
           "osDisk": {
@@ -190,11 +148,11 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('vmSettings').vmName,'/CreateNewAD')]",
-      "apiVersion": "[variables('apiObject')[parameters('azureEnvironment')].compute.extensions]",
+      "apiVersion": "2018-04-01",
+      "name": "[concat(parameters('vmName'),'/CreateNewAD')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmSettings').vmName)]"
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.Powershell",
@@ -204,14 +162,14 @@
         "settings": {
           "wmfVersion": "latest",
           "configuration": {
-            "url": "[variables('adBDCModulesURL')]",
+            "url": "[concat(reference(parameters('storageaccountName'),'2018-02-01').primaryEndpoints['blob'],'/DSC/CreateNewAD.ps1.zip')]",
             "script": "[variables('adBDCConfigurationScript')]",
             "function": "[variables('adBDCConfigurationFunction')]"
           },
           "configurationArguments": {
-            "DomainName": "[parameters('domainSettings').domainFQDN]",
+            "DomainName": "[parameters('domainFQDN')]",
             "AdminCreds": {
-              "UserName": "[parameters('domainSettings').domainAdminUsername]",
+              "UserName": "[parameters('adminUsername')]",
               "Password": "PrivateSettingsRef:AdminPassword"
             }
           }

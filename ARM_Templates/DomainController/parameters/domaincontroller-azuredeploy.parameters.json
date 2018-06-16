@@ -2,36 +2,29 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmSettings": {
-      "value": {
-        "adminUsername": "adminsverho",
-        "sku": "2016-Datacenter-Server-Core-smalldisk",
-        "offer": "WindowsServer",
-        "publisher": "MicrosoftWindowsServer",
-        "vmName": "SRVDC01",
-        "vmSize": "Standard_D2_v3",
-        "availabilitySetName": "AS-DC",
-        "diskEncryptionSequenceVersion": "1.0"
-      }
+    "availabilitySetName": {
+      "value": "AS-DC"
     },
-    "networkSettings": {
-      "value": {
-        "vnetResourceGroupName": "RG-Networking-Workshop",
-        "vnetName": "VNET-Workshop",
-        "subnetName": "SNET-Infra"
-      }
+    "adminUsername": {
+      "value": "adminsverho"
     },
-    "storageSettings": {
-      "value": {
-        "storageAccountType": "Standard_LRS",
-        "storageAccountContainer": "vhds"
-      }
+    "vmName": {
+      "value": "SRVDC01"
     },
-    "domainSettings": {
-      "value": {
-        "domainFQDN": "workshop.local",
-        "domainAdminUsername": "adminsverho"
-      }
+    "vmSize": {
+      "value": "Standard_D2_v3"
+    },
+    "vnetRGName": {
+      "value": "RG-Networking-Workshop"
+    },
+    "vnetName": {
+      "value": "VNET-Workshop"
+    },
+    "subnetName": {
+      "value": "SNET-Infra"
+    },
+    "domainFQDN": {
+      "value": "workshop.local"
     },
     "adminPassword": {
       "reference": {
@@ -49,8 +42,8 @@
         "secretName": "workshoppassword"
       }
     },
-    "azureEnvironment": {
-      "value": "azure"
+    "storageaccountName": {
+      "value": "svhbh54workshopsta"
     }
   }
 }
