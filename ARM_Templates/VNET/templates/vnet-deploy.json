@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VNETInfo":{
+            "type": "object",
+            "metadata": {
+                "description": "Object with necessary VNET parameters incl subnet info"
+            }
+        }
+    },
+    "variables": {
+        "APIVersions":{
+            "Compute": {
+                "VM": "2017-12-01"
+            },
+            "Network":{
+                "vnet": "2017-11-01",
+                "NetworkInterfaces": "2017-11-01"
+            }
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('APIVersions').Network.vnet]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('VNETInfo').VNETName]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('VNETInfo').VNETCIDR]"
+                    ]
+                },
+                "copy": [
+                    {
+                        "name": "subnets",
+                        "count": "[length(parameters('VNETInfo').SubnetArray)]",
+                        "input":{
+                            "name": "[parameters('VNETInfo').SubnetArray[copyIndex('subnets')].SubnetName]",
+                            "properties":{
+                                "addressPrefix": "[parameters('VNETInfo').SubnetArray[copyIndex('subnets')].SubnetCIDR]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "CreatedSubnets":{
+            "value": "[reference(parameters('VNETInfo').VNETName)]",
+            "type": "object"
+        }
+    }
+}

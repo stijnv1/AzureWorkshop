@@ -1,0 +1,26 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VNETInfo":{
+            "value": {
+                "VNETName": "VNET-Workshop",
+                "VNETCIDR": "10.0.0.0/16",
+                "SubnetArray":[
+                    {
+                        "SubnetName": "SNET-Infra",
+                        "SubnetCIDR": "10.0.1.0/24"
+                    },
+                    {
+                        "SubnetName": "SNET-DMZ",
+                        "SubnetCIDR": "10.0.2.0/24"
+                    },
+                    {
+                        "SubnetName": "SNET-WebServers",
+                        "SubnetCIDR": "10.0.3.0/24"
+                    }
+                ]
+            }
+        }
+    }
+  }
