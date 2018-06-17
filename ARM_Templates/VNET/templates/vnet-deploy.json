@@ -7,6 +7,12 @@
             "metadata": {
                 "description": "Object with necessary VNET parameters incl subnet info"
             }
+        },
+        "setDNS": {
+            "type": "bool"
+        },
+        "DNSServers": {
+            "type": "array"
         }
     },
     "variables": {
@@ -31,6 +37,9 @@
                     "addressPrefixes": [
                         "[parameters('VNETInfo').VNETCIDR]"
                     ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": "[if(parameters('setDNS'),parameters('DNSServers'),json('null'))]"
                 },
                 "copy": [
                     {
