@@ -207,10 +207,10 @@
           "typeHandlerVersion": "1.0",
           "autoUpgradeMinorVersion": true,
           "settings": {
-              "workspaceId": "[listkeys(variables('logAnalyticsId'),'2015-11-01-preview').customerId]"
+              "workspaceId": "[reference(resourceid(parameters('OMSWorkspaceRGName'),'Microsoft.OperationalInsights/workspaces',parameters('OMSWorkspaceName')),'2015-11-01-preview').customerId]"
           },
           "protectedSettings": {
-              "workspaceKey": "[listkeys(variables('logAnalyticsId'),'2015-11-01-preview').primarySharedKey]"
+              "workspaceKey": "[listkeys(resourceid(parameters('OMSWorkspaceRGName'),'Microsoft.OperationalInsights/workspaces',parameters('OMSWorkspaceName')),'2015-11-01-preview').primarySharedKey]"
           }
       }
   }
