@@ -50,6 +50,9 @@
       },
       "ouPath": {
           "type": "string"
+      },
+      "dnsLabelPrefix": {
+          "type": "string"
       }
     },
     "variables": {
@@ -71,7 +74,10 @@
         "location": "[resourceGroup().location]",
         "name": "[variables('publicIPName')]",
         "properties": {
-          "publicIPAllocationMethod": "Dynamic"
+          "publicIPAllocationMethod": "Dynamic",
+          "dnsSettings": {
+              "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+          }
         }
       },
       {

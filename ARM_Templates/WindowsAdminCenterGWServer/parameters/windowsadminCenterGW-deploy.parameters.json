@@ -56,6 +56,9 @@
       },
       "ouPath": {
           "value": "OU=Servers,DC=workshop,DC=local"
+      },
+      "dnsLabelPrefix": {
+          "value": "srvwinadmincentersverho"
       }
     }
   }
