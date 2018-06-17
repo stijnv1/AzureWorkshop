@@ -50,7 +50,6 @@
         {
             Name = "Servers"
             Path = "DC=$($DomainName.Split('.')[0]),DC=$($DomainName.Split('.')[1])"
-            Credential = $DomainCreds
             DependsOn = "[xPendingReboot]Reboot1"
         }
 
