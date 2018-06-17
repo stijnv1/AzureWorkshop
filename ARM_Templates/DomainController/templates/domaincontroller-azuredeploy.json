@@ -59,8 +59,7 @@
     "publicIPName": "[concat(parameters('vmName'), '-PIP')]",
     "osPublisher": "MicrosoftWindowsServer",
     "osOffer": "WindowsServer",
-    "osSku": "2016-Datacenter-Server-Core-smalldisk",
-    "logAnalyticsId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('OMSWorkspaceRGName'),'/providers/','Microsoft.OperationalInsights/workspaces/', parameters('OMSWorkspaceName'))]"
+    "osSku": "2016-Datacenter-Server-Core-smalldisk"
   },
   "resources": [
     {
