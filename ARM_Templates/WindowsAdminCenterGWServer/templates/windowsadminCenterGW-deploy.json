@@ -1,0 +1,235 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "availabilitySetName": {
+        "type": "string"
+      },
+      "adminUsername": {
+        "type": "string"
+      },
+      "vmName": {
+        "type": "string"
+      },
+      "vmSize": {
+        "type": "string"
+      },
+      "vnetRGName": {
+        "type": "string"
+      },
+      "vnetName": {
+        "type": "string"
+      },
+      "subnetName": {
+        "type": "string"
+      },
+      "adminPassword": {
+        "type": "securestring"
+      },
+      "domainFQDN": {
+        "type": "string"
+      },
+      "domainAdminPassword": {
+        "type": "securestring"
+      },
+      "storageaccountName": {
+        "type": "string",
+        "metadata": {
+          "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
+        },
+        "defaultValue": ""
+      },
+      "storageaccountNameRGName": {
+        "type": "string"
+      },
+      "OMSWorkspaceRGName": {
+        "type": "string"
+      },
+      "OMSWorkspaceName": {
+        "type": "string"
+      },
+      "ouPath": {
+          "type": "string"
+      }
+    },
+    "variables": {
+      "vnetID": "[resourceid(parameters('vnetRGName'),'Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+      "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
+      "nicName": "[concat(parameters('vmName'),'-NIC')]",
+      "OSDiskName": "[concat(parameters('vmName'),'-OSDisk')]",
+      "publicIPName": "[concat(parameters('vmName'), '-PIP')]",
+      "osPublisher": "MicrosoftWindowsServer",
+      "osOffer": "WindowsServer",
+      "osSku": "2016-Datacenter-Server-Core-smalldisk",
+      "customScriptFileName": "installWindowsAdminCenter.ps1",
+      "customScriptCommandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -file ',variables('customScriptFileName'))]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Network/publicIPAddresses",
+        "apiVersion": "2018-04-01",
+        "location": "[resourceGroup().location]",
+        "name": "[variables('publicIPName')]",
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic"
+        }
+      },
+      {
+        "name": "[parameters('availabilitySetName')]",
+        "type": "Microsoft.Compute/availabilitySets",
+        "apiVersion": "2018-04-01",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [],
+        "properties": {
+          "platformUpdateDomainCount": 20,
+          "platformFaultDomainCount": 3
+        },
+        "sku": {
+          "name": "aligned"
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2018-04-01",
+        "name": "[variables('nicName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": {
+                  "id": "[resourceid('Microsoft.Network/publicIPAddresses', variables('publicIPName'))]"
+                },
+                "subnet": {
+                  "id": "[variables('subnetID')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2018-04-01",
+        "name": "[parameters('vmName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+          "[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]"
+        ],
+        "properties": {
+          "availabilitySet": {
+            "id": "[resourceId('Microsoft.Microsoft.Compute/availabilitySets',parameters('availabilitySetName'))]"
+          },
+          "hardwareProfile": {
+            "vmSize": "[parameters('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[parameters('vmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('osPublisher')]",
+              "offer": "[variables('osOffer')]",
+              "sku": "[variables('osSku')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "name": "[variables('OSDiskName')]",
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              }
+            },
+            "dataDisks": []
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "apiVersion": "2017-12-01",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(parameters('VMName'),'/joindomain')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('VMName'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "JsonADDomainExtension",
+          "typeHandlerVersion": "1.3",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "Name": "[parameters('domainFQDN')]",
+            "OUPath": "[parameters('ouPath')]",
+            "User": "[concat(parameters('domainFQDN'), '\\', parameters('adminUsername'))]",
+            "Restart": "true",
+            "Options": "3"
+          },
+          "protectedSettings": {
+            "Password": "[parameters('domainAdminPassword')]"
+          }
+        }
+      },
+      {
+        "apiVersion": "2017-12-01",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(parameters('VMName'),'/cse')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[resourceId(resourcegroup().name,'Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'joindomain')]"
+        ],
+        "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.9",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+                "fileUris": [
+                    "[concat(reference(resourceid(parameters('storageaccountNameRGName'),'Microsoft.Storage/storageAccounts',parameters('storageaccountName')),'2017-10-01').primaryEndpoints['blob'],'cse/installWindowsAdminCenter.ps1')]"
+                ]
+            },
+            "protectedSettings": {
+                "commandToExecute": "[variables('customScriptCommandToExecute')]",
+                "storageAccountName": "[parameters('storageaccountName')]",
+                "storageAccountKey": "[listKeys(resourceid(parameters('storageaccountNameRGName'),'Microsoft.Storage/storageAccounts',parameters('storageaccountName')),'2017-10-01').keys[0].value]"
+            }
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(parameters('vmName'),'/OMSExtension')]",
+        "apiVersion": "2015-06-15",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[resourceId(resourcegroup().name,'Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'cse')]"
+        ],
+        "properties": {
+            "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+            "type": "MicrosoftMonitoringAgent",
+            "typeHandlerVersion": "1.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+                "workspaceId": "[reference(resourceid(parameters('OMSWorkspaceRGName'),'Microsoft.OperationalInsights/workspaces',parameters('OMSWorkspaceName')),'2015-11-01-preview').customerId]"
+            },
+            "protectedSettings": {
+                "workspaceKey": "[listkeys(resourceid(parameters('OMSWorkspaceRGName'),'Microsoft.OperationalInsights/workspaces',parameters('OMSWorkspaceName')),'2015-11-01-preview').primarySharedKey]"
+            }
+        }
+    }
+    ],
+    "outputs": {}
+  }
