@@ -41,6 +41,12 @@
     },
     "storageaccountNameRGName": {
       "type": "string"
+    },
+    "OMSWorkspaceRGName": {
+      "type": "string"
+    },
+    "OMSWorkspaceName": {
+      "type": "string"
     }
   },
   "variables": {
@@ -53,7 +59,8 @@
     "publicIPName": "[concat(parameters('vmName'), '-PIP')]",
     "osPublisher": "MicrosoftWindowsServer",
     "osOffer": "WindowsServer",
-    "osSku": "2016-Datacenter-Server-Core-smalldisk"
+    "osSku": "2016-Datacenter-Server-Core-smalldisk",
+    "logAnalyticsId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('OMSWorkspaceRGName'),'/providers/','Microsoft.OperationalInsights/workspaces/', parameters('OMSWorkspaceName'))]"
   },
   "resources": [
     {
@@ -185,7 +192,28 @@
           }
         }
       }
-    }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'),'/OMSExtension')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId(resourcegroup().name,'Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'CreateNewAD')]"
+      ],
+      "properties": {
+          "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+          "type": "MicrosoftMonitoringAgent",
+          "typeHandlerVersion": "1.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+              "workspaceId": "[listkeys(variables('logAnalyticsId'),'2015-11-01-preview').customerId]"
+          },
+          "protectedSettings": {
+              "workspaceKey": "[listkeys(variables('logAnalyticsId'),'2015-11-01-preview').primarySharedKey]"
+          }
+      }
+  }
   ],
   "outputs": {}
 }

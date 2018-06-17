@@ -47,6 +47,12 @@
     },
     "storageaccountNameRGName": {
       "value": "RG-WorkshopPreps"
+    },
+    "OMSWorkspaceRGName": {
+      "value": "RG-OMS"
+    },
+    "OMSWorkspaceName": {
+      "value": "svhbh54engiemon"
     }
   }
 }
