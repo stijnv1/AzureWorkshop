@@ -50,7 +50,7 @@
         {
             Name = "Servers"
             Path = "DC=$($DomainName.Split('.')[0]),DC=$($DomainName.Split('.')[1])"
-            DependsOn = "[xPendingReboot]Reboot1"
+            DependsOn = "[xWaitForADDomain]WaitForTestDomain"
         }
 
    }
