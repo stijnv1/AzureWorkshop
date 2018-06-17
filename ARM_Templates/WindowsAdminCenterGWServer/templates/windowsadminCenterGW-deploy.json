@@ -53,6 +53,9 @@
       },
       "dnsLabelPrefix": {
           "type": "string"
+      },
+      "lbName": {
+          "type": "string"
       }
     },
     "variables": {
@@ -95,12 +98,97 @@
         }
       },
       {
+        "apiVersion": "2018-04-01",
+        "type": "Microsoft.Network/loadBalancers",
+        "name": "[parameters('lbName')]",
+        "dependsOn": [
+            "[variables('publicIPName')]"
+        ],
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "frontendIPConfigurations": [
+            {
+              "properties": {
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPName'))]"
+                }                
+              },
+              "name": "LoadBalancerFrontendPublic"
+            }            
+          ],
+          "backendAddressPools": [
+            {
+              "name": "winadmincenter-backend"
+            }
+          ],
+          "loadBalancingRules": [
+            {
+              "properties": {
+                "frontendIPConfiguration": {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/frontendIpConfigurations/LoadBalancerFrontendPublic')]"
+                },
+                "backendAddressPool": {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/backendAddressPools/winadmincenter-backend')]"
+                },
+                "probe": {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/probes/lbprobe-443')]"
+                },
+                "protocol": "Tcp",
+                "frontendPort": 443,
+                "backendPort": 443,
+                "idleTimeoutInMinutes": 15
+              },
+              "Name": "lbrule-tcp443-public"
+            }           
+          ],
+          "probes": [{
+            "properties": {
+              "protocol": "Tcp",
+              "port": 443,
+              "intervalInSeconds": 15,
+              "numberOfProbes": 2
+            },
+            "name": "lbprobe-443"
+          }]
+        },
+        "resources": [
+          {
+            "type": "providers/diagnosticSettings",
+            "name": "[concat('Microsoft.Insights/',parameters('lbName'),'-diagnostics')]",
+            "apiVersion": "2017-05-01-preview",
+            "dependsOn": ["[resourceid('Microsoft.Network/loadBalancers',parameters('lbName'))]"],
+            "properties": {
+              "name": "[concat(parameters('lbName'),'-diagnostics')]",
+              "workspaceId": "[resourceid(parameters('OMSworkspaceRGName'),'Microsoft.OperationalInsights/workspaces',parameters('OMSworkspaceName'))]",
+              "logs": [ 
+                {
+                  "category": "LoadBalancerAlertEvent",
+                  "enabled": true,
+                  "retentionPolicy": {
+                    "days": 0,
+                    "enabled": false
+                  }
+                },
+                {
+                  "category": "LoadBalancerProbeHealthStatus",
+                  "enabled": true,
+                  "retentionPolicy": {
+                    "days": 0,
+                    "enabled": false
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
         "type": "Microsoft.Network/networkInterfaces",
         "apiVersion": "2018-04-01",
         "name": "[variables('nicName')]",
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPName'))]"
+            "[parameters('lbName')]"
         ],
         "properties": {
           "ipConfigurations": [
@@ -108,12 +196,14 @@
               "name": "ipconfig1",
               "properties": {
                 "privateIPAllocationMethod": "Dynamic",
-                "publicIPAddress": {
-                  "id": "[resourceid('Microsoft.Network/publicIPAddresses', variables('publicIPName'))]"
-                },
                 "subnet": {
                   "id": "[variables('subnetID')]"
-                }
+                },
+                "loadBalancerBackendAddressPools": [
+                    {
+                      "id": "[concat(resourceId('Microsoft.Network/loadBalancers',parameters('lbName')), '/backendAddressPools/winadmincenter-backend')]"
+                    }
+                  ]
               }
             }
           ]

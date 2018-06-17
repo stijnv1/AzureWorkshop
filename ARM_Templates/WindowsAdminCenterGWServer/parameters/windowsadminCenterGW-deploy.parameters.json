@@ -59,6 +59,9 @@
       },
       "dnsLabelPrefix": {
           "value": "srvwinadmincentersverho"
+      },
+      "lbName": {
+          "value": "winadmincenter-externallb"
       }
     }
   }
