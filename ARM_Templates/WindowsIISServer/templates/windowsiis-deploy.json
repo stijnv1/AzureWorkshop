@@ -143,24 +143,24 @@
                   "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/backendAddressPools/winadmincenter-backend')]"
                 },
                 "probe": {
-                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/probes/lbprobe-443')]"
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('lbName')), '/probes/lbprobe-80')]"
                 },
                 "protocol": "Tcp",
-                "frontendPort": 443,
-                "backendPort": 443,
+                "frontendPort": 80,
+                "backendPort": 80,
                 "idleTimeoutInMinutes": 15
               },
-              "Name": "lbrule-tcp443-public"
+              "Name": "lbrule-tcp80-public"
             }           
           ],
           "probes": [{
             "properties": {
               "protocol": "Tcp",
-              "port": 443,
+              "port": 80,
               "intervalInSeconds": 15,
               "numberOfProbes": 2
             },
-            "name": "lbprobe-443"
+            "name": "lbprobe-80"
           }]
         },
         "resources": [
