@@ -3,7 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "availabilitySetName": {
-        "type": "string"
+        "type": "string",
+        "defaultValue": "",
+        "metadata": {
+          "description": "Name of the availability set"
+        }
       },
       "adminUsername": {
         "type": "string"
