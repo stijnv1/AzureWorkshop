@@ -239,4 +239,4 @@ New-AzureRMResourceGroupDeployment -Name deployWinAdminCenter -ResourceGroupName
 - After the deployment has finished, go to following URL: `https://<dnsLabelPrefix value you used in step 15>.westeurope.cloudapp.azure.com`
 
 - When prompted for a user account, use following username and the password you inserted as a secret in the created keyvault in step 10:
-  - workshop\<adminUsername parameter value you used in the parameter file of the domain controller deployment>
+  - workshop\\<adminUsername parameter value you used in the parameter file of the domain controller deployment>
