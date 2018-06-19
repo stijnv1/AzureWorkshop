@@ -309,8 +309,7 @@
         "name": "[concat(parameters('vmName'),'/DeployIIS')]",
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]",
-          "[resourceId(resourcegroup().name,'Microsoft.Insights.VMDiagnosticsSettings', parameters('VMName'))]"
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
         ],
         "properties": {
           "publisher": "Microsoft.Powershell",
