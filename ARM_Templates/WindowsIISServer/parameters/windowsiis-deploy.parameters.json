@@ -47,7 +47,7 @@
           "value": "srvwinadmincentersverho"
       },
       "lbName": {
-          "value": "winadmincenter-externallb"
+          "value": "winiis-externallb"
       },
       "dscSASToken": {
         "value": "#{sasToken}#"

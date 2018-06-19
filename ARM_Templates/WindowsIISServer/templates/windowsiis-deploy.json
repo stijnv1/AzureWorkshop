@@ -306,10 +306,11 @@
       {
         "type": "Microsoft.Compute/virtualMachines/extensions",
         "apiVersion": "2015-06-15",
-        "name": "[concat(parameters('vmName'),'/CreateNewAD')]",
+        "name": "[concat(parameters('vmName'),'/DeployIIS')]",
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]",
+          "[resourceId(resourcegroup().name,'Microsoft.Insights.VMDiagnosticsSettings', parameters('VMName'))]"
         ],
         "properties": {
           "publisher": "Microsoft.Powershell",
