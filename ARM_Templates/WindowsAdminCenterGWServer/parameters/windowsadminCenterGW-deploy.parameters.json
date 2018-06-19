@@ -29,7 +29,7 @@
       "adminPassword": {
         "reference": {
           "keyVault": {
-            "id": "/subscriptions/84988180-315f-4795-bb93-900571933667/resourceGroups/RG-WindowsVSTSBuild/providers/Microsoft.KeyVault/vaults/svhbh54keyvault"
+            "id": "#{keyvaultID}#"
           },
           "secretName": "workshoppassword"
         }
