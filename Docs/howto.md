@@ -14,8 +14,8 @@ Execute following command to install the latest version of the modules:
 
 - Go to following URL: [https://github.com/stijnv1/AzureWorkshop](https://github.com/stijnv1/AzureWorkshop)
 
-- Click &#39;Clone or download&#39; in the repository and copy the URL by pressing the highlighted button in the screenshot below:
-![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/githubclone.jpg)
+- Click 'Clone or download&' in the repository and copy the URL by pressing the highlighted button in the screenshot below:
+![github clone](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/githubclone.jpg)
 
 - On your laptop/desktop, create following directory in the root C:\  :
 `AzureWorkshopRepo`
@@ -109,7 +109,7 @@ You can create this storage account using the portal or by using following Azure
 
 - Create an Azure Keyvault using the portal or using following AzureRM Powershell command. If you go via the portal, make sure you enable following settings after the keyvault has been created:
 
-![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/keyvaultscr1.jpg)
+![keyvault](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/keyvaultscr1.jpg)
 
   ```Powershell
   New-AzureRmKeyVault -Name <unique name for keyvault> -ResourceGroupName <resource group you created in step 5> -Location westeurope -EnabledForDeployment -EnabledForTemplateDeployment -EnabledForDiskEncryption
@@ -121,7 +121,7 @@ You can create this storage account using the portal or by using following Azure
 
 Go to `Secrets` | click `Generate/Import`:
 
-![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/keyvaultsecret.jpg)
+![keyvault secret](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/keyvaultsecret.jpg)
 
 Give the secret a name (it is not required that this name is the same as the username you will define for the default windows administrator in the next steps)
 
@@ -133,7 +133,7 @@ Click Create
 
 - In the portal, go to the created Keyvault and go to `Properties`. Copy paste the following value in a notepad so you can quickly access it in the next steps:
 
-![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/keyvaultid.jpg)
+![keyvault id](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/keyvaultid.jpg)
 
 # 12.  Create Log Analytics Workspace
 
@@ -154,27 +154,27 @@ domaincontroller-azuredeploy.parameters.json
 - Update following parameters in this json file with the correct values:
   - adminUsername: give a username you want to use. This will be the default administrator username on the deployed Domain Controller:
 
-    ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr1.jpg)
+    ![adminUsername](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr1.jpg)
 
   - adminPassword and domainAdminPassword: copy paste the copied resource id of the keyvault (step 11) in the `id` field (replace #{keyvaultID}# with the resource id):
 
-      ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr2.jpg)
+      ![adminPassword](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr2.jpg)
 
   - storageaccountName: give the name of the storage account you created in step 6:
 
-    ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr3.jpg)
+    ![storageaccount name](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr3.jpg)
 
   - storageaccountRGName: give the name of the resource group you created in step 5 (= the resource group in which you created the storage account):
 
-    ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr4.jpg)
+    ![storageaccount resource group](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr4.jpg)
 
   - OMSWorkspaceName: give the name of the workspace you created in step 12:
 
-      ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr5.jpg)
+      ![Log Analytics workspace name](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr5.jpg)
 
   - OMSWorkspaceRGName: give the resource group in which you created the workspace:
 
-      ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr6.jpg)
+      ![Log Analytics workspace resource group name](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr6.jpg)
   
   - dscSASToken: create a SAS token using the Azure Portal or use following powershell commands to generate one. Copy paste the generated token:
 
@@ -183,11 +183,11 @@ domaincontroller-azuredeploy.parameters.json
     $ctx = $storageaccount.Context
     New-AzureStorageContainerSASToken -Container dsc -Permissions r -Context $ctx
     ```
-      ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr7.jpg)
+      ![SAS Token](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr7.jpg)
 
   - vnetName: change the value to the name of the VNET you created in step 4:
 
-      ![alt text](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr8.jpg)  
+      ![vnet name](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/paramscr8.jpg)  
 
   - vnetRGName: change the value to the name of the resource group you created in step 3 (=the resource group which contains the VNET)
 
