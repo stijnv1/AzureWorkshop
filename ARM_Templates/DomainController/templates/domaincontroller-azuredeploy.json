@@ -47,6 +47,9 @@
     },
     "OMSWorkspaceName": {
       "type": "string"
+    },
+    "dscSASToken": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -242,7 +245,8 @@
         "protectedSettings": {
           "Items": {
             "AdminPassword": "[parameters('domainAdminPassword')]"
-          }
+          },
+          "configurationUrlSasToken": "[parameters('dscSASToken')]"
         }
       }
     },

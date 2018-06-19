@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "availabilitySetName": {
+        "value": "AS-WINIIS"
+      },
+      "adminUsername": {
+        "value": "adminsverho"
+      },
+      "vmName": {
+        "value": "SRVWINIIS01"
+      },
+      "vmSize": {
+        "value": "Standard_D2_v3"
+      },
+      "vnetRGName": {
+        "value": "RG-Networking-Workshop"
+      },
+      "vnetName": {
+        "value": "VNET-Workshop"
+      },
+      "subnetName": {
+        "value": "SNET-Infra"
+      },
+      "adminPassword": {
+        "reference": {
+          "keyVault": {
+            "id": "/subscriptions/84988180-315f-4795-bb93-900571933667/resourceGroups/RG-WindowsVSTSBuild/providers/Microsoft.KeyVault/vaults/svhbh54keyvault"
+          },
+          "secretName": "workshoppassword"
+        }
+      },
+      "storageaccountName": {
+        "value": "svhbh54workshopsta"
+      },
+      "storageaccountNameRGName": {
+        "value": "RG-WorkshopPreps"
+      },
+      "OMSWorkspaceRGName": {
+        "value": "RG-OMS"
+      },
+      "OMSWorkspaceName": {
+        "value": "svhbh54engiemon"
+      },
+      "dnsLabelPrefix": {
+          "value": "srvwinadmincentersverho"
+      },
+      "lbName": {
+          "value": "winadmincenter-externallb"
+      },
+      "dscSASToken": {
+        "value": "#{sasToken}#"
+      }
+    }
+  }

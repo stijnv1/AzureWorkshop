@@ -53,6 +53,9 @@
     },
     "OMSWorkspaceName": {
       "value": "svhbh54engiemon"
+    },
+    "dscSASToken": {
+      "value": "#{sasToken}#"
     }
   }
 }
