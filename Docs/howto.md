@@ -32,7 +32,7 @@ Execute following command to install the latest version of the modules:
 Following steps describe how to create the resource group via AzureRM Powershell:
 
   ```Powershell
-  New-AzureRMResourceGroup -Name RG-<your username> -Networking -Location westeurope
+  New-AzureRMResourceGroup -Name RG-<your username>-Networking -Location westeurope
   ```
 
 # 4.Create an Azure VNET
