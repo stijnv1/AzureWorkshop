@@ -14,7 +14,7 @@ Execute following command to install the latest version of the modules:
 
 - Go to following URL: [https://github.com/stijnv1/AzureWorkshop](https://github.com/stijnv1/AzureWorkshop)
 
-- Click 'Clone or download&' in the repository and copy the URL by pressing the highlighted button in the screenshot below:
+- Click 'Clone or download' in the repository and copy the URL by pressing the highlighted button in the screenshot below:
 ![github clone](https://github.com/stijnv1/AzureWorkshop/raw/master/Docs/githubclone.jpg)
 
 - On your laptop/desktop, create following directory in the root C:\  :
@@ -101,7 +101,7 @@ You can create this storage account using the portal or by using following Azure
   ```Powershell
   $storageaccount = Get-AzureRMStorageAccount -ResourceGroupName <resourcegroup name you created in step 5> -Name <name of storageaccount created in step 6>
   $ctx = $storageaccount.Context
-  Set-AzureStorageBlobContent -File "C:\AzureWorkshopRepo\AzureWorkshop\ARM\_Templates\DomainController\DSC\CreateNewAD.ps1.zip" -Container dsc )-Blob "CreateNewAD.ps1.zip" -Context $ctx
+  Set-AzureStorageBlobContent -File "C:\AzureWorkshopRepo\AzureWorkshop\ARM\_Templates\DomainController\DSC\CreateNewAD.ps1.zip" -Container dsc -Blob "CreateNewAD.ps1.zip" -Context $ctx
   Set-AzureStorageBlobContent -File "C:\AzureWorkshopRepo\AzureWorkshop\ARM\_Templates\ WindowsAdminCenterGWServer \scripts\installWindowsAdminCenter.ps1" -Container "cse" -Blob "installWindowsAdminCenter.ps1" -Context $ctx
   ```
 
