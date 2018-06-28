@@ -91,10 +91,10 @@ You can create this storage account using the portal or by using following Azure
 # 8.  Upload DSC ZIP Files to Azure Storage Containers
 
 - Upload following ZIP file to the dsc container created in step 7:
-`C:\AzureWorkshopRepo\AzureWorkshop\ARM\_Templates\DomainController\DSC\CreateNewAD.ps1.zip`
+`C:\AzureWorkshopRepo\AzureWorkshop\ARM_Templates\DomainController\DSC\CreateNewAD.ps1.zip`
 
 - Upload following powershell script to the cse container created in step 7:
-`C:\AzureWorkshopRepo\AzureWorkshop\ARM\_Templates\ WindowsAdminCenterGWServer \scripts\installWindowsAdminCenter.ps1`
+`C:\AzureWorkshopRepo\AzureWorkshop\ARM_Templates\WindowsAdminCenterGWServer \scripts\installWindowsAdminCenter.ps1`
 
 - You can use following powershell commands to perform the upload or use the Storage Explorer in the Azure Portal:
 
